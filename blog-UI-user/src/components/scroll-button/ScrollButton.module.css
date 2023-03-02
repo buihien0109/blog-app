@@ -1,0 +1,10 @@
+.btnTop {
+    padding: 10px 20px;
+    background-color: tomato;
+    color: white;
+    border: none;
+
+    position: fixed;
+    bottom: 50px;
+    right: 50px;
+}
