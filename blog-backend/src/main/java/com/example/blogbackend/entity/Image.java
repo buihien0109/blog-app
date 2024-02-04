@@ -2,6 +2,7 @@ package com.example.blogbackend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 
@@ -11,23 +12,25 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "image")
+@Table(name = "images")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Image {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
 
     @Lob // Large Object
-    @Column(name = "data", columnDefinition = "LONGBLOB")
-    private byte[] data;
+    @Column(columnDefinition = "LONGBLOB")
+    byte[] data;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    String type;
+    Double size;
+
+    LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    User user;
 
     @PrePersist
     public void prePersist() {

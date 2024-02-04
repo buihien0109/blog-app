@@ -8,7 +8,7 @@ export const categoryApi = createApi({
     baseQuery: fetchBaseQuery({
         baseUrl: ENDPOINT,
         prepareHeaders: (headers, { getState }) => {
-            const token = getState().auth.token
+            const token = getState().auth.accessToken
             if (token) {
                 headers.set('Authorization', `Bearer ${token}`)
             }
@@ -18,13 +18,43 @@ export const categoryApi = createApi({
     }),
     endpoints: (builder) => ({
         getCategories: builder.query({
-            query: () => "categories",
+            query: () => 'categories',
+            providesTags: ['Category'],
+        }),
+        getCategoryById: builder.query({
+            query: (id) => `categories/${id}`,
+        }),
+        createCategory: builder.mutation({
+            query: (newCategory) => ({
+                url: 'categories',
+                method: 'POST',
+                body: newCategory,
+            }),
+            invalidatesTags: [{ type: 'Category' }],
+        }),
+        updateCategory: builder.mutation({
+            query: ({ id, ...updatedCategory }) => ({
+                url: `categories/${id}`,
+                method: 'PUT',
+                body: updatedCategory,
+            }),
+            invalidatesTags: [{ type: 'Category' }],
+        }),
+        deleteCategory: builder.mutation({
+            query: (id) => ({
+                url: `categories/${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: [{ type: 'Category' }],
         }),
     }),
 });
 
-// Export hooks for usage in functional components, which are
-// auto-generated based on the defined endpoints
+
 export const {
-    useGetCategoriesQuery
+    useGetCategoriesQuery,
+    useGetCategoryByIdQuery,
+    useCreateCategoryMutation,
+    useUpdateCategoryMutation,
+    useDeleteCategoryMutation,
 } = categoryApi;

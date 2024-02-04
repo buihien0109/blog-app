@@ -1,11 +1,11 @@
 package com.example.blogbackend.security;
 
+import com.example.blogbackend.security.error.CustomAccessDenied;
+import com.example.blogbackend.security.error.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -16,8 +16,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final CustomFilter customFilter;
     private final AuthenticationProvider authenticationProvider;
+    private final JwtCustomFilter jwtCustomFilter;
     private final CustomAccessDenied customAccessDenied;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
@@ -40,7 +40,7 @@ public class SecurityConfig {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                     .authenticationProvider(authenticationProvider)
-                    .addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
+                    .addFilterBefore(jwtCustomFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

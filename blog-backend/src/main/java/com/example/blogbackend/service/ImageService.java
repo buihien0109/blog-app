@@ -3,69 +3,59 @@ package com.example.blogbackend.service;
 import com.example.blogbackend.entity.Image;
 import com.example.blogbackend.entity.User;
 import com.example.blogbackend.exception.BadRequestException;
-import com.example.blogbackend.exception.NotFoundException;
+import com.example.blogbackend.exception.ResourceNotFoundException;
+import com.example.blogbackend.model.response.ImageResponse;
 import com.example.blogbackend.repository.ImageRepository;
-import com.example.blogbackend.repository.UserRepository;
-import com.example.blogbackend.response.ImageResponse;
+import com.example.blogbackend.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ImageService {
     private final ImageRepository imageRepository;
-    private final UserRepository userRepository;
 
-    public List<String> getAllImage() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email).orElseThrow(() -> {
-            throw new NotFoundException("Not found user with email = " + email);
-        });
-
+    public List<ImageResponse> getAllImage() {
+        User user = SecurityUtils.getCurrentUserLogin();
         List<Image> images = imageRepository.findByUser_IdOrderByCreatedAtDesc(user.getId());
 
         return images.stream()
-                .map(image -> "/api/public/images/" + image.getId())
+                .map(image -> new ImageResponse(image.getId(), "/api/public/images/" + image.getId()))
                 .toList();
     }
 
-    public byte[] readImage(Integer id) {
-        Image image = imageRepository.findById(id).orElseThrow(() -> {
-            throw new NotFoundException("Not found image with id = " + id);
-        });
-
-        return image.getData();
+    public Image getImageById(Integer id) {
+        return imageRepository.findById(id).orElse(null);
     }
 
     public ImageResponse uploadImage(MultipartFile file) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        log.info("Email auth : {}", email);
-        User user = userRepository.findByEmail(email).orElseThrow(() -> {
-            throw new NotFoundException("Not found user with email = " + email);
-        });
-
-        // Validate file
+        User user = SecurityUtils.getCurrentUserLogin();
         validateFile(file);
 
         try {
             Image image = Image.builder()
                     .data(file.getBytes())
+                    .type(file.getContentType())
+                    .size(extractSize(file))
                     .user(user)
                     .build();
 
             imageRepository.save(image);
 
             String url = "/api/public/images/" + image.getId();
-            return new ImageResponse(url);
+            return ImageResponse.builder()
+                    .id(image.getId())
+                    .url(url)
+                    .build();
         } catch (Exception e) {
-            throw new RuntimeException("Upload image error");
+            log.error("Lỗi khi lưu file", e);
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -73,21 +63,17 @@ public class ImageService {
         // Kiểm tra tên file
         String fileName = file.getOriginalFilename();
         if (fileName == null || fileName.isEmpty()) {
-            throw new BadRequestException("file không không được để trống");
+            throw new BadRequestException("File name không được để trống");
         }
 
-        // image.png -> png
-        // avatar.jpg -> jpg
-        // Kiểm tra đuôi file (jpg, png, jpeg)
         String fileExtension = getFileExtensiton(fileName);
         if (!checkFileExtension(fileExtension)) {
-            throw new BadRequestException("file không đúng định dạng");
+            throw new BadRequestException("File không đúng định dạng");
         }
 
         // Kiểm tra dung lượng file (<= 2MB)
-        double fileSize = (double) (file.getSize() / 1_048_576);
-        if (fileSize > 2) {
-            throw new BadRequestException("file không được vượt quá 2MB");
+        if (extractSize(file) > 2.0) {
+            throw new BadRequestException("File không được vượt quá 2MB");
         }
     }
 
@@ -97,14 +83,27 @@ public class ImageService {
     }
 
     private boolean checkFileExtension(String fileExtension) {
-        List<String> extensions = new ArrayList<>(List.of("png", "jpg", "jpeg", "pdf"));
+        List<String> extensions = new ArrayList<>(List.of("png", "jpg", "jpeg"));
         return extensions.contains(fileExtension.toLowerCase());
     }
 
+    // Tính toán kích thước của file
+    public double extractSize(MultipartFile file) {
+        long sizeInBytes = file.getSize();
+
+        // làm tròn 2 dấu phay động
+        return Math.round((double) sizeInBytes / (1024 * 1024) * 100) / 100.0;
+    }
+
     public void deleteImage(Integer id) {
-        Image image = imageRepository.findById(id).orElseThrow(() -> {
-            throw new NotFoundException("Not found image with id = " + id);
-        });
+        User user = SecurityUtils.getCurrentUserLogin();
+
+        Image image = imageRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy image có id = " + id));
+
+        if (!image.getUser().getId().equals(user.getId())) {
+            throw new BadRequestException("Bạn không có quyền xóa image này");
+        }
 
         imageRepository.delete(image);
     }

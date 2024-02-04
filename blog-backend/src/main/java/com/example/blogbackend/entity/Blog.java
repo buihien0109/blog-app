@@ -2,6 +2,9 @@ package com.example.blogbackend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
@@ -13,54 +16,45 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "blog")
+@Table(name = "blogs")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Blog {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
 
-    @Column(name = "title")
-    private String title;
+    String title;
+    String slug;
 
-    @Column(name = "slug")
-    private String slug;
+    @Column(columnDefinition = "TEXT")
+    String description;
 
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
+    @Column(columnDefinition = "TEXT")
+    String content;
 
-    @Column(name = "content", columnDefinition = "TEXT")
-    private String content;
+    String thumbnail;
 
-    @Column(name = "thumbnail")
-    private String thumbnail;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
+    LocalDateTime publishedAt;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "published_at")
-    private LocalDateTime publishedAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @Column(name = "status")
-    private Boolean status;
+    Boolean status;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    User user;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "blog_category",
             joinColumns = @JoinColumn(name = "blog_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Category> categories = new LinkedHashSet<>();
+    @Fetch(FetchMode.SUBSELECT)
+    Set<Category> categories = new LinkedHashSet<>();
 
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
-        if(status) {
+        if (status) {
             publishedAt = LocalDateTime.now();
         } else {
             publishedAt = null;
@@ -70,7 +64,7 @@ public class Blog {
     @PreUpdate
     public void preUpdate() {
         updatedAt = LocalDateTime.now();
-        if(status) {
+        if (status) {
             publishedAt = LocalDateTime.now();
         } else {
             publishedAt = null;

@@ -2,12 +2,11 @@ package com.example.blogbackend.controller;
 
 import com.example.blogbackend.service.WebService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/public")
+@RequestMapping("/api/public")
 @RequiredArgsConstructor
 public class WebController {
     private final WebService webService;
@@ -27,18 +26,18 @@ public class WebController {
         return ResponseEntity.ok(webService.getAllCategory());
     }
 
-    @GetMapping("categories/top5")
-    public ResponseEntity<?> getTop5Category() {
-        return ResponseEntity.ok(webService.getTop5Category());
+    @GetMapping("categories/top")
+    public ResponseEntity<?> getTopCategory(@RequestParam(required = false, defaultValue = "5") Integer limit) {
+        return ResponseEntity.ok(webService.getTopCategory(limit));
     }
 
-    @GetMapping("categories/{categoryName}")
-    public ResponseEntity<?> getBlogsOfCategory(@PathVariable String categoryName) {
-        return ResponseEntity.ok(webService.getBlogsOfCategory(categoryName));
+    @GetMapping("categories/{slug}")
+    public ResponseEntity<?> getBlogsOfCategory(@PathVariable String slug) {
+        return ResponseEntity.ok(webService.getBlogsOfCategory(slug));
     }
 
-    @GetMapping("blogs/{blogId}/{blogSlug}")
-    public ResponseEntity<?> getBlogDetail(@PathVariable Integer blogId, @PathVariable String blogSlug) {
-        return ResponseEntity.ok(webService.getBlogDetail(blogId, blogSlug));
+    @GetMapping("blogs/{id}/{slug}")
+    public ResponseEntity<?> getBlogDetail(@PathVariable Integer id, @PathVariable String slug) {
+        return ResponseEntity.ok(webService.getBlogDetail(id, slug));
     }
 }

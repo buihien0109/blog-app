@@ -1,50 +1,41 @@
 package com.example.blogbackend.entity;
 
-import com.example.blogbackend.dto.CategoryDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
 
+import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
-@NamedNativeQuery(
-        name = "findCategoriesUsedOther",
-        query = "SELECT c.id, c.name, count(c.id) as used from category c \n" +
-                "left join blog_category bc\n" +
-                "on c.id = bc.category_id \n" +
-                "LEFT join blog b \n" +
-                "on bc.blog_id = b.id\n" +
-                "where b.status = true\n" +
-                "GROUP by c.id",
-        resultSetMapping = "categories"
-)
-@SqlResultSetMapping(
-        name = "categories",
-        classes = @ConstructorResult(
-                targetClass = CategoryDto.class,
-                columns = {
-                        @ColumnResult(name = "id"),
-                        @ColumnResult(name = "name"),
-                        @ColumnResult(name = "used")
-                }
-        )
-)
-@ToString
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "category")
+@Table(name = "categories")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(unique = true, nullable = false)
+    String name;
+
+    @Column(unique = true, nullable = false)
+    String slug;
+
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "categories")
+    Set<Blog> blogs = new LinkedHashSet<>();
 
     @Override
     public boolean equals(Object o) {
@@ -57,5 +48,16 @@ public class Category {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }

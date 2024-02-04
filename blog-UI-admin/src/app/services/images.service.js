@@ -1,30 +1,40 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // Define a service using a base URL and expected endpoints
-const ENDPOINT = "http://localhost:8080/api/admin"
+const ENDPOINT = "http://localhost:8080/api/admin";
 
 export const imageApi = createApi({
     reducerPath: "imageApi",
     baseQuery: fetchBaseQuery({
         baseUrl: ENDPOINT,
         prepareHeaders: (headers, { getState }) => {
-            const token = getState().auth.token
+            const token = getState().auth.accessToken;
             if (token) {
-                headers.set('Authorization', `Bearer ${token}`)
+                headers.set("Authorization", `Bearer ${token}`);
             }
 
-            return headers
+            return headers;
         },
     }),
-    tagTypes: ['Post'],
     endpoints: (builder) => ({
+        getImages: builder.query({
+            query: () => "images",
+            providesTags: ["Image"],
+        }),
         uploadImage: builder.mutation({
-            query: (data) => ({
+            query: (formData) => ({
                 url: "images",
                 method: "POST",
-                body: data,
+                body: formData,
             }),
-            invalidatesTags: ['Post']
+            invalidatesTags: [{ type: "Image" }],
+        }),
+        deleteImage: builder.mutation({
+            query: (imageId) => ({
+                url: `images/${imageId}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: [{ type: "Image" }],
         }),
     }),
 });
@@ -32,5 +42,7 @@ export const imageApi = createApi({
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
-    useUploadImageMutation
+    useGetImagesQuery,
+    useUploadImageMutation,
+    useDeleteImageMutation,
 } = imageApi;

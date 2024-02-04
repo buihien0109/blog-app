@@ -4,12 +4,13 @@ import { authApi } from '../services/auth.service';
 
 const defaultState = {
     auth: null,
-    token: null,
+    accessToken: null,
+    refreshToken: null,
     isAuthenticated: false
 }
 
-const initialState = getDataFromLocalStorage("authBlog")
-    ? getDataFromLocalStorage("authBlog")
+const initialState = getDataFromLocalStorage("authenticatedUser")
+    ? getDataFromLocalStorage("authenticatedUser")
     : defaultState
 
 const authSlice = createSlice({
@@ -17,7 +18,7 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         logout: (state, action) => {
-            setDataToLocalStorage("authBlog", defaultState);
+            setDataToLocalStorage("authenticatedUser", defaultState);
             return defaultState;
         }
     },
@@ -25,12 +26,8 @@ const authSlice = createSlice({
         builder.addMatcher(
             authApi.endpoints.login.matchFulfilled,
             (state, action) => {
-                state.auth = action.payload.auth
-                state.token = action.payload.token
-                state.isAuthenticated = action.payload.isAuthenticated
-
-                // TODO : Cần lưu vào localStorage
-                setDataToLocalStorage("authBlog", state);
+                state.auth = {...state.auth, ...action.payload};
+                setDataToLocalStorage("authenticatedUser", state);
             }
         );
     }

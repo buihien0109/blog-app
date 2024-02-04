@@ -10,11 +10,12 @@ public interface BlogRepository extends JpaRepository<Blog, Integer> {
     List<Blog> findByStatusOrderByPublishedAtDesc(Boolean status);
 
     List<Blog> findByTitleContainsIgnoreCaseAndStatusOrderByPublishedAtDesc(String title, Boolean status);
-    Optional<Blog> findByIdAndSlugAndStatus(Integer id, String slug, Boolean status);
 
-    List<Blog> findByCategories_NameAndStatusOrderByPublishedAtDesc(String name, Boolean status);
+    Optional<Blog> findByIdAndSlugAndStatus(Integer id, String slug, Boolean status);
 
     List<Blog> findByUser_IdOrderByCreatedAtDesc(Integer id);
 
     List<Blog> findByOrderByCreatedAtDesc();
+
+    List<Blog> findByCategories_SlugAndStatusOrderByPublishedAtDesc(String categorySlug, boolean status);
 }

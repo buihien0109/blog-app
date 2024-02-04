@@ -1,13 +1,12 @@
 package com.example.blogbackend.entity;
 
+import com.example.blogbackend.model.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import lombok.experimental.FieldDefaults;
 
-import java.io.Serializable;
-import java.util.*;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,63 +14,39 @@ import java.util.*;
 @Setter
 @Builder
 @Entity
-@Table(name = "user")
-public class User implements UserDetails, Serializable {
+@Table(name = "users")
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false, unique = true)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
 
-    @Column(name = "name")
-    private String name;
+    String name;
 
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
+    @Column(nullable = false, unique = true)
+    String email;
 
-    @Column(name = "avatar")
-    private String avatar;
+    String avatar;
 
-    @Column(name = "password")
-    private String password;
+    @JsonIgnore
+    @Column(nullable = false)
+    String password;
 
-    @Column(name = "role")
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    UserRole role;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<SimpleGrantedAuthority> roles = new ArrayList<>();
-        roles.add(new SimpleGrantedAuthority("ROLE_" + this.role)); // ROLE_USER, ROLE_ADMIN
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
 
-        return roles;
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
-    @Override
-    public String getPassword() {
-        return this.password;
-    }
-
-    @Override
-    public String getUsername() {
-        return this.email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }

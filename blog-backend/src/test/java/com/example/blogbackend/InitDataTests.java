@@ -4,6 +4,7 @@ import com.example.blogbackend.entity.Blog;
 import com.example.blogbackend.entity.Category;
 import com.example.blogbackend.entity.Comment;
 import com.example.blogbackend.entity.User;
+import com.example.blogbackend.model.enums.UserRole;
 import com.example.blogbackend.repository.BlogRepository;
 import com.example.blogbackend.repository.CategoryRepository;
 import com.example.blogbackend.repository.CommentRepository;
@@ -12,19 +13,14 @@ import com.github.javafaker.Faker;
 import com.github.slugify.Slugify;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.annotation.Rollback;
 
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-//@DataJpaTest
-//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @SpringBootTest
 public class InitDataTests {
 
@@ -50,16 +46,17 @@ public class InitDataTests {
     private PasswordEncoder passwordEncoder;
 
     @Test
-    @Rollback(value = false)
-    void save_user() {
+    void save_users() {
         Random rd = new Random();
 
         for (int i = 0; i < 5; i++) {
+            String name = faker.name().fullName();
             User user = User.builder()
-                    .name(faker.name().fullName())
+                    .name(name)
                     .email(faker.internet().emailAddress())
-                    .password(passwordEncoder.encode("111"))
-                    .role(rd.nextInt(2) == 1 ? "ADMIN" : "USER")
+                    .avatar(generateLinkImage(name))
+                    .password(passwordEncoder.encode("123"))
+                    .role(UserRole.values()[rd.nextInt(UserRole.values().length)])
                     .build();
 
             userRepository.save(user);
@@ -67,11 +64,14 @@ public class InitDataTests {
     }
 
     @Test
-    @Rollback(value = false)
-    void save_category() {
-        for (int i = 0; i < 5; i++) {
+    void save_categories() {
+        // Tạo 20 category
+        List<String> categoryNames = List.of("Technology", "Health", "Sport", "Travel", "Food", "Fashion", "Music", "Movie", "Game", "Book", "Education", "Science", "Art", "Design", "Photography", "Business", "Marketing", "Finance", "Economy", "Politics");
+
+        for (String categoryName : categoryNames) {
             Category category = Category.builder()
-                    .name(faker.leagueOfLegends().champion())
+                    .name(categoryName)
+                    .slug(slugify.slugify(categoryName))
                     .build();
 
             categoryRepository.save(category);
@@ -79,30 +79,29 @@ public class InitDataTests {
     }
 
     @Test
-    @Rollback(value = false)
-    void save_blog() {
+    void save_blogs() {
         Random rd = new Random();
 
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findByRole(UserRole.ADMIN);
         List<Category> categories = categoryRepository.findAll();
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 100; i++) {
             // Random 1 user
             User rdUser = users.get(rd.nextInt(users.size()));
 
-            // Random 1 ds category
+            // Mỗi blog có 1 đến 3 category
             Set<Category> rdCategories = new LinkedHashSet<>();
-            for (int j = 0; j < 3; j++) {
-                Category rdCategory = categories.get(rd.nextInt(categories.size()));
-                rdCategories.add(rdCategory);
+            for (int j = 0; j < rd.nextInt(3) + 1; j++) {
+                rdCategories.add(categories.get(rd.nextInt(categories.size())));
             }
 
-            String title = faker.lorem().sentence(10);
+            String title = faker.lorem().sentence(7);
             Blog blog = Blog.builder()
                     .title(title)
                     .slug(slugify.slugify(title))
                     .description(faker.lorem().sentence(20))
                     .content(faker.lorem().sentence(100))
+                    .thumbnail(generateLinkImage(title))
                     .status(rd.nextInt(2) == 1)
                     .user(rdUser)
                     .categories(rdCategories)
@@ -113,27 +112,30 @@ public class InitDataTests {
     }
 
     @Test
-    @Rollback(value = false)
     void save_comment() {
         Random rd = new Random();
 
         List<User> users = userRepository.findAll();
         List<Blog> blogs = blogRepository.findAll();
 
-        for (int i = 0; i < 100; i++) {
-            // Random 1 user
-            User rdUser = users.get(rd.nextInt(users.size()));
+        // Mỗi blog có 5 đến 10 comment
+        for (Blog blog : blogs) {
+            for (int i = 0; i < rd.nextInt(6) + 5; i++) {
+                User rdUser = users.get(rd.nextInt(users.size()));
 
-            // Random 1 blog
-            Blog rdBlog = blogs.get(rd.nextInt(blogs.size()));
+                Comment comment = Comment.builder()
+                        .content(faker.lorem().sentence(20))
+                        .user(rdUser)
+                        .blog(blog)
+                        .build();
 
-            Comment comment = Comment.builder()
-                    .content(faker.lorem().sentence(10))
-                    .blog(rdBlog)
-                    .user(rdUser)
-                    .build();
-
-            commentRepository.save(comment);
+                commentRepository.save(comment);
+            }
         }
+    }
+
+    // generate link author avatar follow struct : https://placehold.co/200x200?text=[...]
+    private String generateLinkImage(String str) {
+        return "https://placehold.co/200x200?text=" + str.substring(0, 1).toUpperCase();
     }
 }

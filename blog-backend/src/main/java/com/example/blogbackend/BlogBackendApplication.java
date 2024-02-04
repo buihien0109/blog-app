@@ -13,19 +13,4 @@ public class BlogBackendApplication {
     public static void main(String[] args) {
         SpringApplication.run(BlogBackendApplication.class, args);
     }
-
-    @Bean
-    public Faker faker() {
-        return new Faker();
-    }
-
-    @Bean
-    public Slugify slugify() {
-        return Slugify.builder().build();
-    }
-
-    @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
-    }
 }
