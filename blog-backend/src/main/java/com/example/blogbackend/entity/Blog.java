@@ -70,6 +70,4 @@ public class Blog {
             publishedAt = null;
         }
     }
-
-
 }

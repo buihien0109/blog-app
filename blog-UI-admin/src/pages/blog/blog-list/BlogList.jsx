@@ -1,7 +1,8 @@
 import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
-import { Button, Space, theme } from "antd";
+import { Button, Space, Spin, theme } from "antd";
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
+import { useGetBlogsQuery } from "../../../app/services/blogs.service";
 import AppBreadCrumb from "../../../components/layout/AppBreadCrumb";
 import BlogTable from "./BlogTable";
 
@@ -12,6 +13,16 @@ const BlogList = () => {
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
+
+    const {
+        data,
+        isLoading: isFetchingBlogs,
+    } = useGetBlogsQuery();
+
+    if (isFetchingBlogs) {
+        return <Spin size="large" fullscreen />
+    }
+
     return (
         <>
             <AppBreadCrumb items={breadcrumb} />
@@ -36,7 +47,7 @@ const BlogList = () => {
                     </RouterLink>
                 </Space>
 
-                <BlogTable />
+                <BlogTable data={data} />
             </div>
 
         </>

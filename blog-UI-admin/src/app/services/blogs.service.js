@@ -1,14 +1,14 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // Define a service using a base URL and expected endpoints
-const ENDPOINT = "http://localhost:8080/api/admin"
+const ENDPOINT = "http://localhost:8080/api/admin";
 
 export const blogApi = createApi({
     reducerPath: "blogApi",
     baseQuery: fetchBaseQuery({
         baseUrl: ENDPOINT,
         prepareHeaders: (headers, { getState }) => {
-            const token = getState().auth.token
+            const token = getState().auth.accessToken
             if (token) {
                 headers.set('Authorization', `Bearer ${token}`)
             }
@@ -16,45 +16,46 @@ export const blogApi = createApi({
             return headers
         },
     }),
-    tagTypes: ['Post'],
+    tagTypes: ["Post"],
     endpoints: (builder) => ({
         getBlogs: builder.query({
             query: () => "blogs",
-            providesTags: ['Post'],
-        }),
-        getBlogById: builder.query({
-            query: (id) => `blogs/${id}`,
-            
+            providesTags: ["Blog"],
         }),
         getOwnBlogs: builder.query({
-            query: () => `blogs/own-blogs`,
-            providesTags: ['Post'],
+            query: () => "blogs/own-blogs",
+            providesTags: ["Blog"],
+        }),
+        getBlogById: builder.query({
+            query: (blogId) => `blogs/${blogId}`,
+            providesTags: (result, error, blogId) => [
+                { type: "Blog", id: blogId },
+            ],
         }),
         createBlog: builder.mutation({
-            query: (data) => ({
+            query: (newBlog) => ({
                 url: "blogs",
                 method: "POST",
-                body: data,
+                body: newBlog,
             }),
-            invalidatesTags: ['Post'],
+            invalidatesTags: ["Blog"],
         }),
         updateBlog: builder.mutation({
-            query: ({ id, ...data }) => {
-                console.log({ id, data });
-                return {
-                    url: `blogs/${id}`,
-                    method: "PUT",
-                    body: data,
-                }
-            },
-            invalidatesTags: ['Post'],
+            query: ({ blogId, ...updatedBlog }) => ({
+                url: `blogs/${blogId}`,
+                method: "PUT",
+                body: updatedBlog,
+            }),
+            invalidatesTags: (result, error, { blogId }) => [
+                { type: "Blog", id: blogId },
+            ],
         }),
         deleteBlog: builder.mutation({
-            query: (id) => ({
-                url: `blogs/${id}`,
+            query: (blogId) => ({
+                url: `blogs/${blogId}`,
                 method: "DELETE",
             }),
-            invalidatesTags: ['Post'],
+            invalidatesTags: ["Blog"],
         }),
     }),
 });
@@ -63,8 +64,8 @@ export const blogApi = createApi({
 // auto-generated based on the defined endpoints
 export const {
     useGetBlogsQuery,
-    useGetBlogByIdQuery,
     useGetOwnBlogsQuery,
+    useGetBlogByIdQuery,
     useCreateBlogMutation,
     useUpdateBlogMutation,
     useDeleteBlogMutation,

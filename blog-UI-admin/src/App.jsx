@@ -1,9 +1,11 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import AppLayout from "./components/layout/AppLayout";
 import NotFound from "./components/error/NotFound";
-import BlogDetail from "./pages/blog/blog-create/BlogDetail";
-import BlogCreate from "./pages/blog/blog-detail/BlogCreate";
+import AppLayout from "./components/layout/AppLayout";
+import AuthorizeRoutes from "./components/private/AuthorizeRoutes";
+import PrivateRoutes from "./components/private/PrivateRoutes";
+import BlogCreate from "./pages/blog/blog-create/BlogCreate";
+import BlogDetail from "./pages/blog/blog-detail/BlogDetail";
 import BlogList from "./pages/blog/blog-list/BlogList";
 import OwnBlogList from "./pages/blog/own-blog/OwnBlogList";
 import CategoryList from "./pages/category/category-list/CategoryList";
@@ -11,8 +13,6 @@ import Login from "./pages/login/Login";
 import UserCreate from "./pages/user/user-create/UserCreate";
 import UserDetail from "./pages/user/user-detail/UserDetail";
 import UserList from "./pages/user/user-list/UserList";
-import PrivateRoutes from "./components/private/PrivateRoutes";
-import AuthorizeRoutes from "./components/private/AuthorizeRoutes";
 
 function App() {
     return (
@@ -22,8 +22,8 @@ function App() {
                     <Route path="/admin" element={<AppLayout />}>
                         <Route path="blogs">
                             <Route index element={<BlogList />} />
-                            <Route path=":blogId/detail" element={<BlogDetail />} />
                             <Route path="own-blogs" element={<OwnBlogList />} />
+                            <Route path=":blogId/detail" element={<BlogDetail />} />
                             <Route path="create" element={<BlogCreate />} />
                         </Route>
                         <Route path="users">

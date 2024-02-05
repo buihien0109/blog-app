@@ -1,5 +1,5 @@
 import { LeftOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, Row, Select, Space, theme, message } from "antd";
+import { Button, Col, Form, Input, Row, Select, Space, message, theme } from "antd";
 import React from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useCreateUserMutation } from "../../../app/services/users.service";
@@ -13,7 +13,7 @@ const UserCreate = () => {
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
-    const [createUser] = useCreateUserMutation();
+    const [createUser, { isLoading }] = useCreateUserMutation();
     const [form] = Form.useForm();
     const navigate = useNavigate();
 
@@ -56,6 +56,7 @@ const UserCreate = () => {
                         type="primary"
                         icon={<PlusOutlined />}
                         onClick={handleCreate}
+                        loading={isLoading}
                     >
                         Tạo user
                     </Button>

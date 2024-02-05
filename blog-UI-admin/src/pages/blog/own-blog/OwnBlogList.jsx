@@ -1,9 +1,10 @@
 import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
-import { Button, Space, theme } from "antd";
+import { Button, Space, theme, Spin } from "antd";
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
 import AppBreadCrumb from "../../../components/layout/AppBreadCrumb";
 import OwnBlogTable from "./OwnBlogTable";
+import { useGetOwnBlogsQuery } from "../../../app/services/blogs.service";
 
 const breadcrumb = [
     { label: "Danh sách bài viết", href: "/admin/blogs" },
@@ -13,6 +14,16 @@ const OwnBlogList = () => {
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
+
+    const {
+        data,
+        isLoading: isFetchingBlogs,
+    } = useGetOwnBlogsQuery();
+
+    if (isFetchingBlogs) {
+        return <Spin size="large" fullscreen />
+    }
+
     return (
         <>
             <AppBreadCrumb items={breadcrumb} />
@@ -30,14 +41,14 @@ const OwnBlogList = () => {
                             Viết bài
                         </Button>
                     </RouterLink>
-                    <RouterLink to="/admin/blogs">
+                    <RouterLink to="/admin/blogs/own-blogs">
                         <Button style={{ backgroundColor: 'rgb(0, 192, 239)' }} type="primary" icon={<ReloadOutlined />}>
                             Refresh
                         </Button>
                     </RouterLink>
                 </Space>
 
-                <OwnBlogTable />
+                <OwnBlogTable data={data}/>
             </div>
 
         </>

@@ -16,7 +16,11 @@ const columns = [
         dataIndex: "name",
         key: "name",
         render: (text, record, index) => {
-            return <RouterLink to={`/admin/users/${record.id}/detail`}>{text}</RouterLink>;
+            return (
+                <RouterLink to={`/admin/users/${record.id}/detail`}>
+                    {text}
+                </RouterLink>
+            );
         },
     },
     {
@@ -36,7 +40,7 @@ const columns = [
                 <Tag color={record.role == "ADMIN" ? "geekblue" : "volcano"}>
                     {text.toUpperCase()}
                 </Tag>
-            )
+            );
         },
     },
     {
@@ -49,5 +53,7 @@ const columns = [
     },
 ];
 
-const UserTable = ({data}) => <Table columns={columns} dataSource={data} rowKey={(record) => record.id}/>;
+const UserTable = ({ data }) => (
+    <Table columns={columns} dataSource={data} rowKey={(record) => record.id} />
+);
 export default UserTable;

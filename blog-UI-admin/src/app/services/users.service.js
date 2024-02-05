@@ -47,6 +47,12 @@ export const userApi = createApi({
             }),
             invalidatesTags: [{ type: 'User' }],
         }),
+        resetPassword: builder.mutation({
+            query: (id) => ({
+                url: `users/${id}/reset-password`,
+                method: 'POST',
+            }),
+        }),
     }),
 });
 
@@ -57,4 +63,5 @@ export const {
     useCreateUserMutation,
     useUpdateUserMutation,
     useDeleteUserMutation,
+    useResetPasswordMutation,
 } = userApi;

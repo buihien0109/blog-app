@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
@@ -35,6 +37,7 @@ public class Category {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "categories")
+    @Fetch(FetchMode.SUBSELECT)
     Set<Blog> blogs = new LinkedHashSet<>();
 
     @Override

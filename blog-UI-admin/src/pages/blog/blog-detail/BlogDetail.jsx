@@ -1,6 +1,5 @@
-import { LeftOutlined, RetweetOutlined, SaveOutlined } from "@ant-design/icons";
+import { DeleteOutlined, LeftOutlined, SaveOutlined } from "@ant-design/icons";
 import {
-    Avatar,
     Button,
     Col,
     Flex,
@@ -15,30 +14,38 @@ import {
     message,
     theme,
 } from "antd";
+import "easymde/dist/easymde.min.css";
 import React, { useEffect, useState } from "react";
-import { Link as RouterLink, useParams } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
+import SimpleMDE from "react-simplemde-editor";
+import {
+    useDeleteBlogMutation,
+    useGetBlogByIdQuery,
+    useUpdateBlogMutation,
+} from "../../../app/services/blogs.service";
+import { useGetCategoriesQuery } from "../../../app/services/categories.service";
 import {
     useDeleteImageMutation,
     useGetImagesQuery,
     useUploadImageMutation,
 } from "../../../app/services/images.service";
-import {
-    useGetUserByIdQuery,
-    useResetPasswordMutation,
-    useUpdateUserMutation,
-} from "../../../app/services/users.service";
 import AppBreadCrumb from "../../../components/layout/AppBreadCrumb";
 
-const UserDetail = () => {
+const BlogDetail = () => {
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
     const [form] = Form.useForm();
-    const { userId } = useParams();
-    const { data: user, isLoading: isFetchingUser } =
-        useGetUserByIdQuery(userId);
+    const navigate = useNavigate();
+
+    const { blogId } = useParams();
+    const { data: blog, isLoading: isFetchingBlog } =
+        useGetBlogByIdQuery(blogId);
+    const { data: categories, isLoading: isFetchingCategories } =
+        useGetCategoriesQuery();
     const { data: imagesData, isLoading: isFetchingImages } =
-        useGetImagesQuery();
+        useGetImagesQuery(blogId);
+
     const images =
         imagesData &&
         imagesData.map((image) => {
@@ -47,41 +54,41 @@ const UserDetail = () => {
                 url: `http://localhost:8080${image.url}`,
             };
         });
-    const [updateUser, { isLoading: isLoadingUpdateUser }] =
-        useUpdateUserMutation();
+    const [updateBlog, { isLoading: isLoadingUpdateBlog }] =
+        useUpdateBlogMutation();
+    const [deleteBlog, { isLoading: isLoadingDeleteBlog }] =
+        useDeleteBlogMutation();
     const [uploadImage, { isLoading: isLoadingUploadImage }] =
         useUploadImageMutation();
     const [deleteImage, { isLoading: isLoadingDeleteImage }] =
         useDeleteImageMutation();
-    const [resetPassword, { isLoading: isLoadingResetPassword }] =
-        useResetPasswordMutation();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [imageSelected, setImageSelected] = useState(null);
-    const [avatar, setAvatar] = useState(null);
+    const [thumbnail, setThumbnail] = useState(null);
 
     const breadcrumb = [
-        { label: "Danh sách user", href: "/admin/users" },
-        { label: user?.name, href: `/admin/users/${user?.id}/detail` },
+        { label: "Danh sách bài viết", href: "/admin/blogs" },
+        { label: blog?.title, href: `/admin/blogs/${blog?.id}/detail` },
     ];
 
     useEffect(() => {
-        if (user && avatar === null) {
-            setAvatar(user?.avatar);
+        if (blog && thumbnail === null) {
+            setThumbnail(blog?.thumbnail);
         }
-    }, [user, avatar]);
+    }, [blog, thumbnail]);
 
-    if (isFetchingUser || isFetchingImages) {
+    if (isFetchingBlog || isFetchingImages || isFetchingCategories) {
         return <Spin size="large" fullscreen />;
     }
 
     const handleUpdate = () => {
         form.validateFields()
             .then((values) => {
-                return updateUser({ id: user.id, ...values }).unwrap();
+                return updateBlog({ blogId, ...values }).unwrap();
             })
             .then((data) => {
-                message.success("Cập nhật thông tin user thành công!");
+                message.success("Cập nhật bài viết thành công!");
             })
             .catch((error) => {
                 console.log("error", error);
@@ -89,17 +96,16 @@ const UserDetail = () => {
             });
     };
 
-    const handleResetPassword = () => {
-        resetPassword(user.id)
+    const handleDelete = () => {
+        deleteBlog(blog.id)
             .unwrap()
             .then((data) => {
-                message.success(
-                    "Reset mật khẩu thành công. Mật khẩu mới là: 123456",
-                    2
-                );
+                message.success("Xóa bài viết thành công!");
+                setTimeout(() => {
+                    navigate("/admin/blogs");
+                }, 1500);
             })
             .catch((error) => {
-                console.log("error", error);
                 message.error(error.data.message);
             });
     };
@@ -151,100 +157,141 @@ const UserDetail = () => {
                     borderRadius: borderRadiusLG,
                 }}
             >
-                <Space style={{ marginBottom: "1rem" }}>
-                    <RouterLink to="/admin/users">
-                        <Button type="default" icon={<LeftOutlined />}>
-                            Quay lại
+                <Flex justify="space-between" align="center">
+                    <Space style={{ marginBottom: "1rem" }}>
+                        <RouterLink to="/admin/blogs">
+                            <Button type="default" icon={<LeftOutlined />}>
+                                Quay lại
+                            </Button>
+                        </RouterLink>
+                        <Button
+                            style={{ backgroundColor: "rgb(60, 141, 188)" }}
+                            type="primary"
+                            icon={<SaveOutlined />}
+                            onClick={handleUpdate}
+                            loading={isLoadingUpdateBlog}
+                        >
+                            Cập nhật
                         </Button>
-                    </RouterLink>
+                    </Space>
                     <Button
-                        style={{ backgroundColor: "rgb(60, 141, 188)" }}
                         type="primary"
-                        icon={<SaveOutlined />}
-                        onClick={handleUpdate}
-                        loading={isLoadingUpdateUser}
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={handleDelete}
+                        loading={isLoadingDeleteBlog}
                     >
-                        Cập nhật
+                        Xóa bài viết
                     </Button>
-                    <Button
-                        style={{ backgroundColor: "rgb(243, 156, 18)" }}
-                        type="primary"
-                        icon={<RetweetOutlined />}
-                        onClick={handleResetPassword}
-                        loading={isLoadingResetPassword}
-                    >
-                        Reset mật khẩu
-                    </Button>
-                </Space>
+                </Flex>
 
                 <Form
                     form={form}
                     layout="vertical"
                     autoComplete="off"
-                    initialValues={user}
+                    initialValues={{
+                        ...blog,
+                        categoryIds: blog.categories.map(
+                            (category) => category.id
+                        ),
+                    }}
                 >
-                    <Row>
-                        <Col span={12}>
+                    <Row gutter={16}>
+                        <Col span={16}>
                             <Form.Item
-                                label="Họ tên"
-                                name="name"
+                                label="Tiêu đề"
+                                name="title"
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Họ tên không được để trống!",
+                                        message: "Tiêu đề không được để trống!",
                                     },
                                 ]}
                             >
-                                <Input placeholder="Enter name" />
+                                <Input placeholder="Enter title" />
                             </Form.Item>
 
                             <Form.Item
-                                label="Email"
-                                name="email"
+                                label="Nội dung"
+                                name="content"
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Họ tên không được để trống!",
-                                    },
-                                    {
-                                        type: "email",
-                                        message: "Email không đúng định dạng!",
+                                        message:
+                                            "Nội dung không được để trống!",
                                     },
                                 ]}
                             >
-                                <Input placeholder="Enter email" disabled />
+                                <SimpleMDE />
                             </Form.Item>
 
                             <Form.Item
-                                label="Quyền"
-                                name="role"
+                                label="Mô tả"
+                                name="description"
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Quyền không được để trống!",
+                                        message: "Mô tả không được để trống!",
+                                    },
+                                ]}
+                            >
+                                <Input.TextArea
+                                    rows={4}
+                                    placeholder="Enter description"
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item
+                                label="Trạng thái"
+                                name="status"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:
+                                            "Trạng thái không được để trống!",
                                     },
                                 ]}
                             >
                                 <Select
                                     style={{ width: "100%" }}
                                     options={[
-                                        { label: "ADMIN", value: "ADMIN" },
-                                        { label: "USER", value: "USER" },
+                                        { label: "Nháp", value: false },
+                                        { label: "Công khai", value: true },
                                     ]}
                                 />
                             </Form.Item>
 
-                            <Form.Item name="avatar">
-                                <Space direction="vertical">
-                                    <Avatar
-                                        src={<img src={avatar} alt="avatar" />}
-                                        size={180}
+                            <Form.Item label="Danh mục" name="categoryIds">
+                                <Select
+                                    mode="multiple"
+                                    style={{ width: "100%" }}
+                                    options={categories.map((category) => ({
+                                        label: category.name,
+                                        value: category.id,
+                                    }))}
+                                />
+                            </Form.Item>
+
+                            <Form.Item name="thumbnail">
+                                <Space
+                                    direction="vertical"
+                                    style={{ width: "100%" }}
+                                >
+                                    <img
+                                        style={{
+                                            width: "100%",
+                                            height: 300,
+                                            objectFit: "cover",
+                                        }}
+                                        src={thumbnail}
+                                        alt="Thumbnail"
                                     />
                                     <Button
                                         type="primary"
                                         onClick={() => setIsModalOpen(true)}
                                     >
-                                        Thay đổi ảnh đại diện
+                                        Thay đổi ảnh bài viết
                                     </Button>
                                 </Space>
                             </Form.Item>
@@ -285,10 +332,10 @@ const UserDetail = () => {
                                 type="primary"
                                 disabled={!imageSelected}
                                 onClick={() => {
-                                    setAvatar(imageSelected);
+                                    setThumbnail(imageSelected);
                                     setIsModalOpen(false);
                                     form.setFieldsValue({
-                                        avatar: imageSelected,
+                                        thumbnail: imageSelected,
                                     });
                                 }}
                             >
@@ -334,4 +381,4 @@ const UserDetail = () => {
     );
 };
 
-export default UserDetail;
+export default BlogDetail;

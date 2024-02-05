@@ -1,9 +1,22 @@
 import { LeftOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, Row, Select, Space, theme } from "antd";
+import {
+    Button,
+    Col,
+    Form,
+    Input,
+    Row,
+    Select,
+    Space,
+    Spin,
+    message,
+    theme,
+} from "antd";
 import "easymde/dist/easymde.min.css";
 import React from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import SimpleMDE from "react-simplemde-editor";
+import { useCreateBlogMutation } from "../../../app/services/blogs.service";
+import { useGetCategoriesQuery } from "../../../app/services/categories.service";
 import AppBreadCrumb from "../../../components/layout/AppBreadCrumb";
 
 const breadcrumb = [
@@ -15,18 +28,29 @@ const BlogCreate = () => {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
     const [form] = Form.useForm();
+    const { data: categories, isLoading: isFetchingCategories } =
+        useGetCategoriesQuery();
+    const [createBlog, { isLoading }] = useCreateBlogMutation();
+    const navigate = useNavigate();
 
-    const handleCreate = async () => {
-        try {
-            // Validate fields
-            const values = await form.validateFields();
-            console.log("Form data values:", values);
+    if (isFetchingCategories) {
+        return <Spin size="large" fullscreen />;
+    }
 
-            // TODO: Gửi dữ liệu lên server
-        } catch (error) {
-            // Handle validation error
-            console.error("Validation failed:", error);
-        }
+    const handleCreate = () => {
+        form.validateFields()
+            .then((values) => {
+                return createBlog(values).unwrap();
+            })
+            .then((data) => {
+                message.success("Tạo bài viết thành công!");
+                setTimeout(() => {
+                    navigate(`/admin/blogs/${data.id}/detail`);
+                }, 1500);
+            })
+            .catch((error) => {
+                message.error(error.data.message);
+            });
     };
 
     return (
@@ -51,6 +75,7 @@ const BlogCreate = () => {
                         type="primary"
                         icon={<PlusOutlined />}
                         onClick={handleCreate}
+                        loading={isLoading}
                     >
                         Tạo bài viết
                     </Button>
@@ -101,7 +126,10 @@ const BlogCreate = () => {
                                     },
                                 ]}
                             >
-                                <Input.TextArea rows={4} placeholder="Enter description" />
+                                <Input.TextArea
+                                    rows={4}
+                                    placeholder="Enter description"
+                                />
                             </Form.Item>
                         </Col>
                         <Col span={8}>
@@ -129,17 +157,10 @@ const BlogCreate = () => {
                                 <Select
                                     mode="multiple"
                                     style={{ width: "100%" }}
-                                    options={[
-                                        { label: "ReactJS", value: 1 },
-                                        { label: "NodeJS", value: 2 },
-                                        { label: "MongoDB", value: 3 },
-                                        { label: "ExpressJS", value: 4 },
-                                        { label: "JavaScript", value: 5 },
-                                        { label: "HTML", value: 6 },
-                                        { label: "CSS", value: 7 },
-                                        { label: "SASS", value: 8 },
-                                        { label: "LESS", value: 9 },
-                                    ]}
+                                    options={categories.map((category) => ({
+                                        label: category.name,
+                                        value: category.id,
+                                    }))}
                                 />
                             </Form.Item>
                         </Col>

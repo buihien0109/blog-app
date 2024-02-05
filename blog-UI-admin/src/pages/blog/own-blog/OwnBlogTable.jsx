@@ -8,13 +8,18 @@ const columns = [
         dataIndex: "title",
         key: "title",
         render: (text, record, index) => {
-            return <RouterLink to={`/admin/blogs/${record.id}/detail`}>{text}</RouterLink>;
+            return (
+                <RouterLink to={`/admin/blogs/${record.id}/detail`}>
+                    {text}
+                </RouterLink>
+            );
         },
     },
     {
         title: "Danh mục",
         dataIndex: "categories",
         key: "categories",
+        width: "20%",
         render: (text, record, index) => {
             return text.map((category) => (
                 <Tag color={"geekblue"} key={category.id}>
@@ -27,6 +32,7 @@ const columns = [
         title: "Trạng thái",
         dataIndex: "status",
         key: "status",
+        width: "10%",
         render: (text, record, index) => {
             return text ? "Công khai" : "Nháp";
         },
@@ -35,79 +41,14 @@ const columns = [
         title: "Ngày tạo",
         dataIndex: "createdAt",
         key: "createdAt",
+        width: "15%",
         render: (text, record, index) => {
             return formatDate(text);
         },
     },
 ];
-const data = [
-    {
-        key: "1",
-        id: 1,
-        title: "Học lập trình như thế nào?",
-        author: {
-            id: 1,
-            name: "Bùi Hiên",
-        },
-        categories: [
-            {
-                id: 1,
-                name: "Lập trình",
-            },
-            {
-                id: 2,
-                name: "ReactJS",
-            },
-        ],
-        status: true,
-        createdAt: new Date("2024-02-03 16:08:23.158354"),
-    },
-    {
-        key: "2",
-        id: 2,
-        title: "Các kỹ thuật khác nhau để bảo mật dữ liệu riêng tư trong iOS swift",
-        author: {
-            id: 2,
-            name: "Minh Duy",
-        },
-        categories: [
-            {
-                id: 3,
-                name: "IOS",
-            },
-            {
-                id: 4,
-                name: "Database",
-            },
-        ],
-        status: false,
-        createdAt: new Date("2024-02-03 16:08:23.158354"),
-    },
-    {
-        key: "3",
-        id: 3,
-        title: "Thiết kế Kiến trúc Microservices với Spring đơn giản",
-        author: {
-            id: 3,
-            name: "Thu Hằng",
-        },
-        categories: [
-            {
-                id: 5,
-                name: "SpringBoot",
-            },
-            {
-                id: 6,
-                name: "Backend",
-            },
-            {
-                id: 7,
-                name: "Java",
-            },
-        ],
-        status: true,
-        createdAt: new Date("2024-02-03 16:08:23.158354"),
-    },
-];
-const OwnBlogTable = () => <Table columns={columns} dataSource={data} />;
+
+const OwnBlogTable = ({ data }) => (
+    <Table columns={columns} dataSource={data} rowKey={(record) => record.id} />
+);
 export default OwnBlogTable;
