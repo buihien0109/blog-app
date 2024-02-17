@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // Define a service using a base URL and expected endpoints
-const ENDPOINT = "http://localhost:8080/api/admin"
+const ENDPOINT = import.meta.env.VITE_API_DOMAIN_ADMIN;
 
 export const categoryApi = createApi({
     reducerPath: "categoryApi",

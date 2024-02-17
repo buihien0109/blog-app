@@ -13,6 +13,7 @@ import {
 } from "antd";
 import "easymde/dist/easymde.min.css";
 import React from "react";
+import { Helmet } from "react-helmet";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import SimpleMDE from "react-simplemde-editor";
 import { useCreateBlogMutation } from "../../../app/services/blogs.service";
@@ -55,6 +56,9 @@ const BlogCreate = () => {
 
     return (
         <>
+            <Helmet>
+                <title>Tạo bài viết</title>
+            </Helmet>
             <AppBreadCrumb items={breadcrumb} />
             <div
                 style={{
@@ -113,7 +117,14 @@ const BlogCreate = () => {
                                     },
                                 ]}
                             >
-                                <SimpleMDE />
+                                <SimpleMDE
+                                    options={{
+                                        autofocus: true,
+                                        renderingConfig: {
+                                            codeSyntaxHighlighting: true, // Tắt tô sáng mã nguồn bởi SimpleMDE
+                                        },
+                                    }}
+                                />
                             </Form.Item>
 
                             <Form.Item

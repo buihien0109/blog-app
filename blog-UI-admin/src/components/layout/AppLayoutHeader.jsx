@@ -1,12 +1,15 @@
-import { Avatar, Dropdown, Flex } from "antd";
+import { Avatar, Dropdown, Flex, message } from "antd";
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../app/slices/auth.slice";
 
 function AppLayoutHeader() {
     const { auth } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
 
     const handleLogout = () => {
-        console.log("Logout");
+        dispatch(logout());
+        message.success("Đăng xuất thành công");
     };
 
     const items = [

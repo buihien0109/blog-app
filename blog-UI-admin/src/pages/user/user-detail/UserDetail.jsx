@@ -7,15 +7,18 @@ import {
     Form,
     Input,
     Modal,
+    Pagination,
     Row,
     Select,
     Space,
     Spin,
     Upload,
     message,
-    theme,
+    theme
 } from "antd";
 import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
+import { useSelector } from "react-redux";
 import { Link as RouterLink, useParams } from "react-router-dom";
 import {
     useDeleteImageMutation,
@@ -33,11 +36,12 @@ const UserDetail = () => {
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
+    const imagesData = useSelector((state) => state.images);
     const [form] = Form.useForm();
     const { userId } = useParams();
     const { data: user, isLoading: isFetchingUser } =
         useGetUserByIdQuery(userId);
-    const { data: imagesData, isLoading: isFetchingImages } =
+    const { isLoading: isFetchingImages } =
         useGetImagesQuery();
     const images =
         imagesData &&
@@ -60,6 +64,14 @@ const UserDetail = () => {
     const [imageSelected, setImageSelected] = useState(null);
     const [avatar, setAvatar] = useState(null);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 12; // số lượng hình ảnh mỗi trang
+    const totalImages = images.length; // tổng số hình ảnh
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = Math.min(startIndex + pageSize, totalImages);
+    const imagesRendered = images.slice(startIndex, endIndex);
+
+
     const breadcrumb = [
         { label: "Danh sách user", href: "/admin/users" },
         { label: user?.name, href: `/admin/users/${user?.id}/detail` },
@@ -74,6 +86,10 @@ const UserDetail = () => {
     if (isFetchingUser || isFetchingImages) {
         return <Spin size="large" fullscreen />;
     }
+
+    const onPageChange = page => {
+        setCurrentPage(page);
+    };
 
     const handleUpdate = () => {
         form.validateFields()
@@ -142,6 +158,9 @@ const UserDetail = () => {
 
     return (
         <>
+            <Helmet>
+                <title>{user.name}</title>
+            </Helmet>
             <AppBreadCrumb items={breadcrumb} />
             <div
                 style={{
@@ -308,14 +327,14 @@ const UserDetail = () => {
 
                     <div style={{ marginTop: "1rem" }} id="image-container">
                         <Row gutter={[16, 16]} wrap={true}>
-                            {images &&
-                                images.map((image, index) => (
+                            {imagesRendered &&
+                                imagesRendered.map((image, index) => (
                                     <Col span={6} key={index}>
                                         <div
                                             className={`${imageSelected === image.url
-                                                    ? "image-selected"
-                                                    : ""
-                                                } image-item`}
+                                                ? "image-selected"
+                                                : ""
+                                                } image-item border`}
                                             onClick={selecteImage(image.url)}
                                         >
                                             <img
@@ -328,6 +347,15 @@ const UserDetail = () => {
                                 ))}
                         </Row>
                     </div>
+
+                    <Pagination
+                        current={currentPage}
+                        pageSize={pageSize}
+                        total={totalImages}
+                        onChange={onPageChange}
+                        showSizeChanger={false}
+                        style={{ marginTop: 16, textAlign: 'center' }}
+                    />
                 </Modal>
             </div>
         </>

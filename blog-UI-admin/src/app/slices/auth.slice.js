@@ -26,7 +26,11 @@ const authSlice = createSlice({
         builder.addMatcher(
             authApi.endpoints.login.matchFulfilled,
             (state, action) => {
-                state.auth = {...state.auth, ...action.payload};
+                const { user, accessToken, refreshToken, isAuthenticated } = action.payload;
+                state.auth = user;
+                state.accessToken = accessToken;
+                state.refreshToken = refreshToken;
+                state.isAuthenticated = isAuthenticated;
                 setDataToLocalStorage("authenticatedUser", state);
             }
         );

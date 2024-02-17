@@ -28,7 +28,7 @@ public class AuthController {
             return ResponseEntity.ok(authResponse);
         } catch (AuthenticationException e) {
             log.error("Error: {}", e.getMessage());
-            ErrorMessage error = new ErrorMessage(HttpStatus.BAD_REQUEST, "Email hoặc mật khẩu không đúng");
+            ErrorMessage error = new ErrorMessage(HttpStatus.BAD_REQUEST.value(), "Email hoặc mật khẩu không đúng");
             return ResponseEntity.badRequest().body(error);
         }
     }

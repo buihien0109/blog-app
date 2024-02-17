@@ -22,7 +22,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
         // Tao doi tuong
-        ErrorMessage error = new ErrorMessage(HttpStatus.UNAUTHORIZED, "Bạn cần đăng nhập");
+        ErrorMessage error = new ErrorMessage(HttpStatus.UNAUTHORIZED.value(), "Bạn cần đăng nhập");
 
         // Set thuoc tinh cho response
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
@@ -21,4 +22,6 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     boolean existsByName(String name);
 
     boolean existsByNameAndIdNot(String name, Integer id);
+
+    Optional<Category> findBySlug(String slug);
 }

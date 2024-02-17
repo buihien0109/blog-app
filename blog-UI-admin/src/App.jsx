@@ -1,6 +1,7 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import NotFound from "./components/error/NotFound";
+import ForbiddenPage from "./components/error-page/ForbiddenPage";
+import NotFoundPage from "./components/error-page/NotFoundPage";
 import AppLayout from "./components/layout/AppLayout";
 import AuthorizeRoutes from "./components/private/AuthorizeRoutes";
 import PrivateRoutes from "./components/private/PrivateRoutes";
@@ -9,7 +10,11 @@ import BlogDetail from "./pages/blog/blog-detail/BlogDetail";
 import BlogList from "./pages/blog/blog-list/BlogList";
 import OwnBlogList from "./pages/blog/own-blog/OwnBlogList";
 import CategoryList from "./pages/category/category-list/CategoryList";
+import Dashboard from "./pages/dashboard/Dashboard";
 import Login from "./pages/login/Login";
+import ProjectCreate from "./pages/project/project-create/ProjectCreate";
+import ProjectDetail from "./pages/project/project-detail/ProjectDetail";
+import ProjectList from "./pages/project/project-list/ProjectList";
 import UserCreate from "./pages/user/user-create/UserCreate";
 import UserDetail from "./pages/user/user-detail/UserDetail";
 import UserList from "./pages/user/user-list/UserList";
@@ -20,6 +25,7 @@ function App() {
             <Route element={<PrivateRoutes />}>
                 <Route element={<AuthorizeRoutes requireRoles={["ADMIN"]} />}>
                     <Route path="/admin" element={<AppLayout />}>
+                        <Route path="dashboard" element={<Dashboard />}></Route>
                         <Route path="blogs">
                             <Route index element={<BlogList />} />
                             <Route path="own-blogs" element={<OwnBlogList />} />
@@ -31,6 +37,11 @@ function App() {
                             <Route path=":userId/detail" element={<UserDetail />} />
                             <Route path="create" element={<UserCreate />} />
                         </Route>
+                        <Route path="projects">
+                            <Route index element={<ProjectList />} />
+                            <Route path=":projectId/detail" element={<ProjectDetail />} />
+                            <Route path="create" element={<ProjectCreate />} />
+                        </Route>
                         <Route path="categories">
                             <Route index element={<CategoryList />} />
                         </Route>
@@ -38,7 +49,7 @@ function App() {
                 </Route>
             </Route>
             <Route path="/admin/login" element={<Login />} />
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={<NotFoundPage />} />
         </Routes>
     );
 }

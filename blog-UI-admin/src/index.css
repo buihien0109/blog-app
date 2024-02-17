@@ -23,12 +23,16 @@ a {
     text-decoration: none;
 }
 
-.image-selected {
-    border: 3px solid rgb(60, 141, 188);
+.image-item.image-selected {
+    border: 3px solid rgb(60, 141, 188) !important;
 }
 
 .EasyMDEContainer .CodeMirror {
     height: 450px !important;
+}
+
+.EasyMDEContainer .CodeMirror.CodeMirror-fullscreen {
+    height: auto !important;
 }
 
 .login-container {

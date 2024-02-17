@@ -36,7 +36,7 @@ const columns = [
         width: "20%",
         render: (text, record, index) => {
             return text.map((category) => (
-                <Tag color={"geekblue"} key={category.id}>
+                <Tag color={"geekblue"} key={category.id} style={{marginBottom: 7}}>
                     {category.name.toUpperCase()}
                 </Tag>
             ));

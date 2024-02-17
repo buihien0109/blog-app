@@ -1,6 +1,7 @@
 import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
 import { Button, Space, Spin, theme } from "antd";
 import React from "react";
+import { Helmet } from "react-helmet";
 import { Link as RouterLink } from "react-router-dom";
 import { useGetUsersQuery } from "../../../app/services/users.service";
 import AppBreadCrumb from "../../../components/layout/AppBreadCrumb";
@@ -25,6 +26,9 @@ const UserList = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Danh sách user</title>
+      </Helmet>
       <AppBreadCrumb items={breadcrumb} />
       <div
         style={{

@@ -2,6 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import Header from "../header/Header";
+import ScrollButton from "../scroll-button/ScrollButton";
 
 function Layout() {
     return (
@@ -15,6 +16,7 @@ function Layout() {
                 hideProgressBar={true}
                 theme="colored"
             />
+            <ScrollButton />
         </>
     );
 }

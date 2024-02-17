@@ -3,6 +3,7 @@ package com.example.blogbackend.service;
 import com.example.blogbackend.entity.Blog;
 import com.example.blogbackend.entity.Category;
 import com.example.blogbackend.entity.User;
+import com.example.blogbackend.entity.ViewHistory;
 import com.example.blogbackend.exception.ResourceNotFoundException;
 import com.example.blogbackend.model.request.UpsertBlogRequest;
 import com.example.blogbackend.repository.BlogRepository;

@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // Define a service using a base URL and expected endpoints
-const ENDPOINT = "http://localhost:8080/api/admin";
+const ENDPOINT = import.meta.env.VITE_API_DOMAIN_ADMIN;
 
 export const imageApi = createApi({
     reducerPath: "imageApi",
@@ -19,7 +19,6 @@ export const imageApi = createApi({
     endpoints: (builder) => ({
         getImages: builder.query({
             query: () => "images",
-            providesTags: ["Image"],
         }),
         uploadImage: builder.mutation({
             query: (formData) => ({
@@ -27,14 +26,12 @@ export const imageApi = createApi({
                 method: "POST",
                 body: formData,
             }),
-            invalidatesTags: [{ type: "Image" }],
         }),
         deleteImage: builder.mutation({
             query: (imageId) => ({
                 url: `images/${imageId}`,
                 method: "DELETE",
             }),
-            invalidatesTags: [{ type: "Image" }],
         }),
     }),
 });

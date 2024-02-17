@@ -1,13 +1,16 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const END_POINT = "http://localhost:8080/api/public";
+const ENDPOINT = import.meta.env.VITE_API_DOMAIN_PUBLIC;
 
 export const blogApi = createApi({
     reducerPath: "blogApi",
-    baseQuery: fetchBaseQuery({ baseUrl: END_POINT }),
+    baseQuery: fetchBaseQuery({ baseUrl: ENDPOINT }),
     endpoints: (builder) => ({
+        getBlogLatest: builder.query({
+            query: (limit) => `blogs/latest?limit=${limit}`,
+        }),
         getBlogs: builder.query({
-            query: () => `blogs`,
+            query: ({ page, limit }) => `blogs?page=${page}&limit=${limit}`,
         }),
         searchBlog: builder.query({
             query: (term) => `blogs/search?term=${term}`,
@@ -15,12 +18,21 @@ export const blogApi = createApi({
         getBlogDetail: builder.query({
             query: ({ id, slug }) => `blogs/${id}/${slug}`,
         }),
+        getMostViewBlogs: builder.query({
+            query: (limit = 5) => `blogs/most-view?limit=${limit}`,
+        }),
+        getRecommendBlogs: builder.query({
+            query: ({ id, limit }) => `blogs/${id}/recommend?limit=${limit}`,
+        }),
     }),
 });
 
 export const {
+    useGetBlogLatestQuery,
     useGetBlogsQuery,
     useSearchBlogQuery,
     useGetBlogDetailQuery,
-    useLazySearchBlogQuery
+    useLazySearchBlogQuery,
+    useGetMostViewBlogsQuery,
+    useGetRecommendBlogsQuery,
 } = blogApi;

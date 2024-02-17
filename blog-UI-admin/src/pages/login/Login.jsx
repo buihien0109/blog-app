@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
 import styled from 'styled-components';
 import { useLoginMutation } from "../../app/services/auth.service";
+import { Helmet } from "react-helmet";
 
 const StyledTitle = styled(Typography.Title).attrs({ level: 4 })`
   margin-bottom: 0 !important;
@@ -36,59 +37,65 @@ const App = () => {
     };
 
     return (
-        <div className="login-container">
-            <Spin spinning={isLoading} tip="Đang xử lý...">
-                <div className="form-login">
-                    <StyledTitle>
-                        Đăng nhập Admin
-                    </StyledTitle>
-                    <Form
-                        layout="vertical"
-                        style={{
-                            backgroundColor: "#fff",
-                            padding: 24,
-                        }}
-                        onFinish={handleLogin}
-                        autoComplete="off"
-                    >
-                        <Form.Item
-                            name="email"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Email không được để trống!",
-                                },
-                                {
-                                    type: "email",
-                                    message: "Email không đúng định dạng!",
-                                },
-                            ]}
+        <>
+            <Helmet>
+                <title>Đăng nhập</title>
+            </Helmet>
+            <div className="login-container">
+                <Spin spinning={isLoading} tip="Đang xử lý...">
+                    <div className="form-login">
+                        <StyledTitle>
+                            Đăng nhập Admin
+                        </StyledTitle>
+                        <Form
+                            layout="vertical"
+                            style={{
+                                backgroundColor: "#fff",
+                                padding: 24,
+                            }}
+                            onFinish={handleLogin}
+                            autoComplete="off"
                         >
-                            <Input placeholder="Email" />
-                        </Form.Item>
+                            <Form.Item
+                                name="email"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Email không được để trống!",
+                                    },
+                                    {
+                                        type: "email",
+                                        message: "Email không đúng định dạng!",
+                                    },
+                                ]}
+                            >
+                                <Input placeholder="Email" />
+                            </Form.Item>
 
-                        <Form.Item
-                            name="password"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Mật khẩu không được để trống!",
-                                },
-                            ]}
-                        >
-                            <Input.Password placeholder="Password" />
-                        </Form.Item>
+                            <Form.Item
+                                name="password"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Mật khẩu không được để trống!",
+                                    },
+                                ]}
+                            >
+                                <Input.Password placeholder="Password" />
+                            </Form.Item>
 
-                        <Form.Item style={{ marginBottom: 0 }}>
-                            <Button type="primary" htmlType="submit" block>
-                                Đăng nhập
-                            </Button>
-                        </Form.Item>
-                    </Form>
-                </div>
-            </Spin>
+                            <Form.Item style={{ marginBottom: 0 }}>
+                                <Button type="primary" htmlType="submit" block>
+                                    Đăng nhập
+                                </Button>
+                            </Form.Item>
+                        </Form>
+                    </div>
+                </Spin>
 
-        </div>
+            </div>
+        </>
+
     );
 };
 export default App;

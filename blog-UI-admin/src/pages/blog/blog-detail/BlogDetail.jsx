@@ -6,16 +6,18 @@ import {
     Form,
     Input,
     Modal,
+    Pagination,
     Row,
     Select,
     Space,
     Spin,
     Upload,
     message,
-    theme,
+    theme
 } from "antd";
 import "easymde/dist/easymde.min.css";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import SimpleMDE from "react-simplemde-editor";
 import {
@@ -30,6 +32,7 @@ import {
     useUploadImageMutation,
 } from "../../../app/services/images.service";
 import AppBreadCrumb from "../../../components/layout/AppBreadCrumb";
+import { Helmet } from "react-helmet";
 
 const BlogDetail = () => {
     const {
@@ -39,11 +42,12 @@ const BlogDetail = () => {
     const navigate = useNavigate();
 
     const { blogId } = useParams();
+    const imagesData = useSelector((state) => state.images);
     const { data: blog, isLoading: isFetchingBlog } =
         useGetBlogByIdQuery(blogId);
     const { data: categories, isLoading: isFetchingCategories } =
         useGetCategoriesQuery();
-    const { data: imagesData, isLoading: isFetchingImages } =
+    const { isLoading: isFetchingImages } =
         useGetImagesQuery(blogId);
 
     const images =
@@ -67,6 +71,13 @@ const BlogDetail = () => {
     const [imageSelected, setImageSelected] = useState(null);
     const [thumbnail, setThumbnail] = useState(null);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 12; // số lượng hình ảnh mỗi trang
+    const totalImages = images.length; // tổng số hình ảnh
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = Math.min(startIndex + pageSize, totalImages);
+    const imagesRendered = images.slice(startIndex, endIndex);
+
     const breadcrumb = [
         { label: "Danh sách bài viết", href: "/admin/blogs" },
         { label: blog?.title, href: `/admin/blogs/${blog?.id}/detail` },
@@ -81,6 +92,10 @@ const BlogDetail = () => {
     if (isFetchingBlog || isFetchingImages || isFetchingCategories) {
         return <Spin size="large" fullscreen />;
     }
+
+    const onPageChange = page => {
+        setCurrentPage(page);
+    };
 
     const handleUpdate = () => {
         form.validateFields()
@@ -97,17 +112,32 @@ const BlogDetail = () => {
     };
 
     const handleDelete = () => {
-        deleteBlog(blog.id)
-            .unwrap()
-            .then((data) => {
-                message.success("Xóa bài viết thành công!");
-                setTimeout(() => {
-                    navigate("/admin/blogs");
-                }, 1500);
-            })
-            .catch((error) => {
-                message.error(error.data.message);
-            });
+        Modal.confirm({
+            title: "Bạn có chắc chắn muốn xóa bài viết này?",
+            content: "Hành động này không thể hoàn tác!",
+            okText: "Xóa",
+            okType: "danger",
+            cancelText: "Hủy",
+            onOk: () => {
+                deleteBlog(blog.id)
+                    .unwrap()
+                    .then((data) => {
+                        message.success("Xóa bài viết thành công!");
+                        setTimeout(() => {
+                            navigate("/admin/blogs");
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        message.error(error.data.message);
+                    });
+            },
+            footer: (_, { OkBtn, CancelBtn }) => (
+                <>
+                    <CancelBtn />
+                    <OkBtn />
+                </>
+            ),
+        });
     };
 
     const selecteImage = (image) => () => {
@@ -148,6 +178,9 @@ const BlogDetail = () => {
 
     return (
         <>
+            <Helmet>
+                <title>{blog.title}</title>
+            </Helmet>
             <AppBreadCrumb items={breadcrumb} />
             <div
                 style={{
@@ -157,8 +190,8 @@ const BlogDetail = () => {
                     borderRadius: borderRadiusLG,
                 }}
             >
-                <Flex justify="space-between" align="center">
-                    <Space style={{ marginBottom: "1rem" }}>
+                <Flex justify="space-between" align="center" style={{ marginBottom: "1rem" }}>
+                    <Space>
                         <RouterLink to="/admin/blogs">
                             <Button type="default" icon={<LeftOutlined />}>
                                 Quay lại
@@ -355,13 +388,13 @@ const BlogDetail = () => {
 
                     <div style={{ marginTop: "1rem" }} id="image-container">
                         <Row gutter={[16, 16]} wrap={true}>
-                            {images &&
-                                images.map((image, index) => (
+                            {imagesRendered &&
+                                imagesRendered.map((image, index) => (
                                     <Col span={6} key={index}>
                                         <div
                                             className={`${imageSelected === image.url
-                                                    ? "image-selected"
-                                                    : ""
+                                                ? "image-selected"
+                                                : ""
                                                 } image-item`}
                                             onClick={selecteImage(image.url)}
                                         >
@@ -375,6 +408,15 @@ const BlogDetail = () => {
                                 ))}
                         </Row>
                     </div>
+
+                    <Pagination
+                        current={currentPage}
+                        pageSize={pageSize}
+                        total={totalImages}
+                        onChange={onPageChange}
+                        showSizeChanger={false}
+                        style={{ marginTop: 16, textAlign: 'center' }}
+                    />
                 </Modal>
             </div>
         </>

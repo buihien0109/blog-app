@@ -25,8 +25,13 @@ public class JwtCustomFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("request URI : {}", request.getRequestURI());
-        String authHeader = request.getHeader("Authorization");
+        // If request has URI /api/public, then skip this filter
+        if (request.getRequestURI().startsWith("/api/public")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
+        String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.contains("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -37,7 +42,6 @@ public class JwtCustomFilter extends OncePerRequestFilter {
 
         if (userEmail != null) {
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(userEmail);
-            log.info("userDetails : {}", userDetails.getUsername());
 
             if (jwtUtils.isTokenValid(jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(

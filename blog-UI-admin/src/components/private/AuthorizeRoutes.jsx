@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
-import Forbiden from "../error/Forbiden";
+import ForbiddenPage from "../error-page/ForbiddenPage";
 
 function AuthorizeRoutes({ requireRoles }) {
     const { auth } = useSelector((state) => state.auth);
@@ -9,7 +9,7 @@ function AuthorizeRoutes({ requireRoles }) {
 
     const canAccess = role && requireRoles.includes(role);
     if (!canAccess) {
-        return <Forbiden />;
+        return <ForbiddenPage />;
     }
 
     return (

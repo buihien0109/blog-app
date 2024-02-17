@@ -1,14 +1,8 @@
 package com.example.blogbackend;
 
-import com.example.blogbackend.entity.Blog;
-import com.example.blogbackend.entity.Category;
-import com.example.blogbackend.entity.Comment;
-import com.example.blogbackend.entity.User;
+import com.example.blogbackend.entity.*;
 import com.example.blogbackend.model.enums.UserRole;
-import com.example.blogbackend.repository.BlogRepository;
-import com.example.blogbackend.repository.CategoryRepository;
-import com.example.blogbackend.repository.CommentRepository;
-import com.example.blogbackend.repository.UserRepository;
+import com.example.blogbackend.repository.*;
 import com.github.javafaker.Faker;
 import com.github.slugify.Slugify;
 import org.junit.jupiter.api.Test;
@@ -44,6 +38,25 @@ public class InitDataTests {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ProjectRepository projectRepository;
+
+    @Test
+    void save_project() {
+        for (int i = 0; i < 10; i++) {
+            String title = faker.lorem().sentence(7);
+            Project project = Project.builder()
+                    .title(title)
+                    .description(faker.lorem().sentence(50))
+                    .thumbnail(generateLinkImage(title))
+                    .link(faker.internet().url())
+                    .source(faker.internet().url())
+                    .build();
+
+            projectRepository.save(project);
+        }
+    }
 
     @Test
     void save_users() {

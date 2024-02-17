@@ -1,6 +1,7 @@
 import { LeftOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Col, Form, Input, Row, Select, Space, message, theme } from "antd";
 import React from "react";
+import { Helmet } from "react-helmet";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useCreateUserMutation } from "../../../app/services/users.service";
 import AppBreadCrumb from "../../../components/layout/AppBreadCrumb";
@@ -35,6 +36,9 @@ const UserCreate = () => {
 
     return (
         <>
+            <Helmet>
+                <title>Tạo user</title>
+            </Helmet>
             <AppBreadCrumb items={breadcrumb} />
 
             <div

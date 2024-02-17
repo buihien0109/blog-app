@@ -1,19 +1,19 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const END_POINT = "http://localhost:8080/api/public";
+const ENDPOINT = import.meta.env.VITE_API_DOMAIN_PUBLIC;
 
 export const categoryApi = createApi({
     reducerPath: "categoryApi",
-    baseQuery: fetchBaseQuery({ baseUrl: END_POINT }),
+    baseQuery: fetchBaseQuery({ baseUrl: ENDPOINT }),
     endpoints: (builder) => ({
         getCategoies: builder.query({
             query: () => `categories`,
         }),
-        getTop5Categories: builder.query({
-            query: () => `categories/top5`,
+        getCategoryBySlug: builder.query({
+            query: (slug) => `categories/${slug}`,
         }),
         getBlogsOfCategory: builder.query({
-            query: (name) => `categories/${name}`,
+            query: ({ slug, page, limit }) => `categories/${slug}/blogs?page=${page}&limit=${limit}`,
         }),
     }),
 });
@@ -21,5 +21,5 @@ export const categoryApi = createApi({
 export const {
     useGetCategoiesQuery,
     useGetBlogsOfCategoryQuery,
-    useGetTop5CategoriesQuery,
+    useGetCategoryBySlugQuery,
 } = categoryApi;

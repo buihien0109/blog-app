@@ -1,22 +1,21 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // Define a service using a base URL and expected endpoints
-const ENDPOINT = "http://localhost:8080/api/admin";
+const ENDPOINT = import.meta.env.VITE_API_DOMAIN_ADMIN;
 
 export const blogApi = createApi({
     reducerPath: "blogApi",
     baseQuery: fetchBaseQuery({
         baseUrl: ENDPOINT,
         prepareHeaders: (headers, { getState }) => {
-            const token = getState().auth.accessToken
+            const token = getState().auth.accessToken;
             if (token) {
-                headers.set('Authorization', `Bearer ${token}`)
+                headers.set("Authorization", `Bearer ${token}`);
             }
 
-            return headers
+            return headers;
         },
     }),
-    tagTypes: ["Post"],
     endpoints: (builder) => ({
         getBlogs: builder.query({
             query: () => "blogs",

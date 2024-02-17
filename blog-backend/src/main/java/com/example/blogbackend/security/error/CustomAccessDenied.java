@@ -22,7 +22,7 @@ public class CustomAccessDenied implements AccessDeniedHandler {
                        HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException, ServletException {
         // Tao doi tuong
-        ErrorMessage error = new ErrorMessage(HttpStatus.FORBIDDEN, "Bạn không có quyền");
+        ErrorMessage error = new ErrorMessage(HttpStatus.FORBIDDEN.value(), "Bạn không có quyền");
 
         // Set thuoc tinh cho response
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

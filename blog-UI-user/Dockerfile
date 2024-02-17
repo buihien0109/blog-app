@@ -1,0 +1,13 @@
+# Stage 1: Build React application
+FROM node:16-alpine as build
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Stage 2: Create production environment
+FROM nginx:alpine
+RUN mkdir /app
+COPY --from=build /app/build /app
+COPY nginx.conf /etc/nginx/nginx.conf

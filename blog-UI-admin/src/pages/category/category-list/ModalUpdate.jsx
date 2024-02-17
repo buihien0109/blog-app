@@ -1,14 +1,21 @@
-import { Button, Form, Input, Modal, Space } from "antd";
+import { Button, Form, Input, Modal, Space, message } from "antd";
 import React from "react";
+import { useUpdateCategoryMutation } from "../../../app/services/categories.service";
 
 const ModalUpdate = (props) => {
-    const { category, open, onCancel, onHandleUpdate } = props;
-
+    const { category, open, onCancel } = props;
+    const [updateCategory, { isLoading }] = useUpdateCategoryMutation();
 
     const onFinish = (values) => {
-        const { name } = values;
-        onHandleUpdate({ id: category.id, name });
-        onCancel();
+        updateCategory({ id: category.id, name: values.name })
+            .unwrap()
+            .then((data) => {
+                message.success("Cập nhật danh mục thành công!");
+                onCancel();
+            })
+            .catch((error) => {
+                message.error(error.data.message);
+            });
     };
 
     return (
@@ -18,6 +25,7 @@ const ModalUpdate = (props) => {
                 title="Cập nhật danh mục"
                 footer={null}
                 onCancel={onCancel}
+                confirmLoading={isLoading}
             >
                 <Form
                     layout="vertical"
@@ -38,7 +46,7 @@ const ModalUpdate = (props) => {
                     </Form.Item>
                     <Form.Item>
                         <Space>
-                            <Button type="primary" htmlType="submit">
+                            <Button type="primary" htmlType="submit" loading={isLoading}>
                                 Cập nhật
                             </Button>
                         </Space>

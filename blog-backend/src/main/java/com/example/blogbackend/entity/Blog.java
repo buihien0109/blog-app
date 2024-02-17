@@ -40,6 +40,8 @@ public class Blog {
 
     Boolean status;
 
+    Integer viewCount;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     User user;
@@ -51,8 +53,17 @@ public class Blog {
     @Fetch(FetchMode.SUBSELECT)
     Set<Category> categories = new LinkedHashSet<>();
 
+    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT)
+    Set<ViewHistory> viewHistories = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT)
+    Set<Comment> comments = new LinkedHashSet<>();
+
     @PrePersist
     public void prePersist() {
+        viewCount = 0;
         createdAt = LocalDateTime.now();
         if (status) {
             publishedAt = LocalDateTime.now();
@@ -69,5 +80,25 @@ public class Blog {
         } else {
             publishedAt = null;
         }
+    }
+
+    public void addViewHistory(ViewHistory viewHistory) {
+        viewHistories.add(viewHistory);
+        viewHistory.setBlog(this);
+    }
+
+    public void removeViewHistory(ViewHistory viewHistory) {
+        viewHistories.remove(viewHistory);
+        viewHistory.setBlog(null);
+    }
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
+        comment.setBlog(this);
+    }
+
+    public void removeComment(Comment comment) {
+        comments.remove(comment);
+        comment.setBlog(null);
     }
 }

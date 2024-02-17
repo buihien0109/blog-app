@@ -15,7 +15,7 @@ import java.util.Map;
 public class CustomExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<?> handleBadRequestException(BadRequestException e) {
-        ErrorMessage message = new ErrorMessage(HttpStatus.BAD_REQUEST, e.getMessage());
+        ErrorMessage message = new ErrorMessage(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         return new ResponseEntity<>(
                 message,
                 HttpStatus.BAD_REQUEST
@@ -24,7 +24,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException e) {
-        ErrorMessage message = new ErrorMessage(HttpStatus.NOT_FOUND, e.getMessage());
+        ErrorMessage message = new ErrorMessage(HttpStatus.NOT_FOUND.value(), e.getMessage());
         return new ResponseEntity<>(
                 message,
                 HttpStatus.NOT_FOUND
@@ -34,7 +34,7 @@ public class CustomExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception e) {
         e.printStackTrace();
-        ErrorMessage message = new ErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        ErrorMessage message = new ErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
         return new ResponseEntity<>(
                 message,
                 HttpStatus.INTERNAL_SERVER_ERROR
@@ -51,7 +51,7 @@ public class CustomExceptionHandler {
         });
 
         return new ResponseEntity<>(
-                new ErrorMessage(HttpStatus.BAD_REQUEST, errors),
+                new ErrorMessage(HttpStatus.BAD_REQUEST.value(), errors),
                 HttpStatus.BAD_REQUEST
         );
     }

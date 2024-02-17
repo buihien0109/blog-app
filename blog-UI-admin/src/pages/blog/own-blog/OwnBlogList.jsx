@@ -1,10 +1,11 @@
 import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
-import { Button, Space, theme, Spin } from "antd";
+import { Button, Space, Spin, theme } from "antd";
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
+import { useGetOwnBlogsQuery } from "../../../app/services/blogs.service";
 import AppBreadCrumb from "../../../components/layout/AppBreadCrumb";
 import OwnBlogTable from "./OwnBlogTable";
-import { useGetOwnBlogsQuery } from "../../../app/services/blogs.service";
+import { Helmet } from "react-helmet";
 
 const breadcrumb = [
     { label: "Danh sách bài viết", href: "/admin/blogs" },
@@ -26,6 +27,9 @@ const OwnBlogList = () => {
 
     return (
         <>
+            <Helmet>
+                <title>Bài viết của tôi</title>
+            </Helmet>
             <AppBreadCrumb items={breadcrumb} />
             <div
                 style={{
@@ -48,7 +52,7 @@ const OwnBlogList = () => {
                     </RouterLink>
                 </Space>
 
-                <OwnBlogTable data={data}/>
+                <OwnBlogTable data={data} />
             </div>
 
         </>

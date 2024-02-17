@@ -4,12 +4,11 @@ import React, { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import {
     useCreateCategoryMutation,
-    useDeleteCategoryMutation,
     useGetCategoriesQuery,
-    useUpdateCategoryMutation,
 } from "../../../app/services/categories.service";
 import AppBreadCrumb from "../../../components/layout/AppBreadCrumb";
 import CategoryTable from "./CategoryTable";
+import { Helmet } from "react-helmet";
 
 const breadcrumb = [{ label: "Danh sách danh mục", href: "/admin/categories" }];
 const CategoryList = () => {
@@ -17,27 +16,23 @@ const CategoryList = () => {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
-    const {
-        data,
-        isLoading: isFetchingCategories,
-    } = useGetCategoriesQuery();
-    const [createCategory] = useCreateCategoryMutation();
-    const [updateCategory] = useUpdateCategoryMutation();
-    const [deleteCategory] = useDeleteCategoryMutation();
+    const { data, isLoading: isFetchingCategories } = useGetCategoriesQuery();
+    const [createCategory, { isLoading: isLoadingCreate }] =
+        useCreateCategoryMutation();
 
     const [form] = Form.useForm();
     const [open, setOpen] = useState(false);
 
     if (isFetchingCategories) {
-        return <Spin size="large" fullscreen />
+        return <Spin size="large" fullscreen />;
     }
 
     const handleCreate = (values) => {
         createCategory(values)
             .unwrap()
             .then((data) => {
-                setOpen(false);
                 form.resetFields();
+                setOpen(false);
                 message.success("Tạo danh mục thành công!");
             })
             .catch((error) => {
@@ -45,29 +40,11 @@ const CategoryList = () => {
             });
     };
 
-    const handleDelete = (id) => {
-        deleteCategory(id)
-            .unwrap()
-            .then((data) => {
-                message.success("Xóa danh mục thành công!");
-            })
-            .catch((error) => {
-                message.error(error.data.message);
-            });
-    };
-
-    const handeUpdate = (values) => {
-        updateCategory(values)
-            .unwrap()
-            .then((data) => {
-                message.success("Câp nhật danh mục thành công!");
-            })
-            .catch((error) => {
-                message.error(error.data.message);
-            });
-    };
     return (
         <>
+            <Helmet>
+                <title>Danh sách danh mục</title>
+            </Helmet>
             <AppBreadCrumb items={breadcrumb} />
             <div
                 style={{
@@ -97,17 +74,14 @@ const CategoryList = () => {
                     </RouterLink>
                 </Space>
 
-                <CategoryTable
-                    data={data}
-                    onDelete={handleDelete}
-                    onUpdate={handeUpdate}
-                />
+                <CategoryTable data={data} />
             </div>
             <Modal
                 open={open}
                 title="Tạo danh mục"
                 footer={null}
                 onCancel={() => setOpen(false)}
+                confirmLoading={isLoadingCreate}
             >
                 <Form
                     form={form}
@@ -128,7 +102,11 @@ const CategoryList = () => {
                     </Form.Item>
                     <Form.Item>
                         <Space>
-                            <Button type="primary" htmlType="submit">
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                loading={isLoadingCreate}
+                            >
                                 Lưu
                             </Button>
                         </Space>

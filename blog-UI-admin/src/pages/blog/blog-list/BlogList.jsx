@@ -5,6 +5,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { useGetBlogsQuery } from "../../../app/services/blogs.service";
 import AppBreadCrumb from "../../../components/layout/AppBreadCrumb";
 import BlogTable from "./BlogTable";
+import { Helmet } from "react-helmet";
 
 const breadcrumb = [
     { label: "Danh sách bài viết", href: "/admin/blogs" },
@@ -25,6 +26,9 @@ const BlogList = () => {
 
     return (
         <>
+            <Helmet>
+                <title>Danh sách bài viết</title>
+            </Helmet>
             <AppBreadCrumb items={breadcrumb} />
             <div
                 style={{

@@ -16,10 +16,6 @@ function AppMenu() {
     // Tìm kiếm menu cha của menu con có id trùng với defaultSelectedKeys hoặc menu cha có url là prefix của pathname => return menu cha đó
     const defaultOpenKeys = menu.find((item) => item.subs.find((sub) => sub.id === defaultSelectedKeys) || pathname.includes(item.url));
 
-    console.log(`pathname: ${pathname}`)
-    console.log(`defaultSelectedKeys: ${defaultSelectedKeys}`);
-    console.log(defaultOpenKeys);
-
     return (
         <Menu
             theme="dark"

@@ -1,4 +1,10 @@
-import { FileTextOutlined, PieChartOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
+import {
+    FileTextOutlined,
+    PieChartOutlined,
+    ProjectOutlined,
+    TeamOutlined,
+    UserOutlined,
+} from "@ant-design/icons";
 
 const menu = [
     {
@@ -11,8 +17,8 @@ const menu = [
                 id: 11,
                 label: "Dashboard",
                 url: "/admin/dashboard",
-            }
-        ]
+            },
+        ],
     },
     {
         id: 2,
@@ -34,8 +40,8 @@ const menu = [
                 id: 23,
                 label: "Tạo bài viết",
                 url: "/admin/blogs/create",
-            }
-        ]
+            },
+        ],
     },
     {
         id: 3,
@@ -52,8 +58,8 @@ const menu = [
                 id: 32,
                 label: "Tạo user",
                 url: "/admin/users/create",
-            }
-        ]
+            },
+        ],
     },
     {
         id: 4,
@@ -65,9 +71,27 @@ const menu = [
                 id: 41,
                 label: "Danh sách danh mục",
                 url: "/admin/categories",
-            }
-        ]
-    }
-]
+            },
+        ],
+    },
+    {
+        id: 5,
+        label: "Quản lý project",
+        icon: ProjectOutlined,
+        url: "/admin/projects",
+        subs: [
+            {
+                id: 51,
+                label: "Danh sách project",
+                url: "/admin/projects",
+            },
+            {
+                id: 52,
+                label: "Tạo project",
+                url: "/admin/projects/create",
+            },
+        ],
+    },
+];
 
 export default menu;

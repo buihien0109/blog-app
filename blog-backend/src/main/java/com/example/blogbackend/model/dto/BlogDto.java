@@ -19,12 +19,6 @@ public class BlogDto {
     String title;
     String slug;
     String description;
-    String content;
     String thumbnail;
-    LocalDateTime createdAt;
     LocalDateTime publishedAt;
-    LocalDateTime updatedAt;
-    Boolean status;
-    UserDto user;
-    Set<Category> categories;
 }
