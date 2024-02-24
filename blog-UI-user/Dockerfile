@@ -9,5 +9,6 @@ RUN npm run build
 # Stage 2: Create production environment
 FROM nginx:alpine
 RUN mkdir /app
-COPY --from=build /app/build /app
+COPY --from=build /app/dist /app
+EXPOSE 80
 COPY nginx.conf /etc/nginx/nginx.conf
