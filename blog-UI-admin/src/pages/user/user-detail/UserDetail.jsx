@@ -31,6 +31,7 @@ import {
     useUpdateUserMutation,
 } from "../../../app/services/users.service";
 import AppBreadCrumb from "../../../components/layout/AppBreadCrumb";
+import { API_DOMAIN } from "../../../data/constants";
 
 const UserDetail = () => {
     const {
@@ -48,7 +49,7 @@ const UserDetail = () => {
         imagesData.map((image) => {
             return {
                 id: image.id,
-                url: `http://localhost:8080${image.url}`,
+                url: `${API_DOMAIN}${image.url}`,
             };
         });
     const [updateUser, { isLoading: isLoadingUpdateUser }] =
@@ -79,7 +80,7 @@ const UserDetail = () => {
 
     useEffect(() => {
         if (user && avatar === null) {
-            setAvatar(user?.avatar);
+            setAvatar(`${API_DOMAIN}${user?.avatar}`);
         }
     }, [user, avatar]);
 
@@ -307,7 +308,7 @@ const UserDetail = () => {
                                     setAvatar(imageSelected);
                                     setIsModalOpen(false);
                                     form.setFieldsValue({
-                                        avatar: imageSelected,
+                                        avatar: imageSelected.slice(API_DOMAIN.length),
                                     });
                                 }}
                             >

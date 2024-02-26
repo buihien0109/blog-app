@@ -1,10 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-const ENDPOINT = import.meta.env.VITE_API_DOMAIN_PUBLIC;
+import { API_DOMAIN, API_DOMAIN_PUBLIC } from "../../data/constants";
 
 export const categoryApi = createApi({
     reducerPath: "categoryApi",
-    baseQuery: fetchBaseQuery({ baseUrl: ENDPOINT }),
+    baseQuery: fetchBaseQuery({ baseUrl: API_DOMAIN_PUBLIC }),
     endpoints: (builder) => ({
         getCategoies: builder.query({
             query: () => `categories`,
@@ -14,6 +13,16 @@ export const categoryApi = createApi({
         }),
         getBlogsOfCategory: builder.query({
             query: ({ slug, page, limit }) => `categories/${slug}/blogs?page=${page}&limit=${limit}`,
+            transformResponse: (response, meta, arg) => {
+                return {
+                    ...response, content: response.content.map((item) => {
+                        return {
+                            ...item,
+                            thumbnail: `${API_DOMAIN}${item.thumbnail}`
+                        };
+                    })
+                }
+            },
         }),
     }),
 });

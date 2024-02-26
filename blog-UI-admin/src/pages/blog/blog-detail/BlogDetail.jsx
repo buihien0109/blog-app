@@ -33,6 +33,7 @@ import {
 } from "../../../app/services/images.service";
 import AppBreadCrumb from "../../../components/layout/AppBreadCrumb";
 import { Helmet } from "react-helmet";
+import { API_DOMAIN } from "../../../data/constants";
 
 const BlogDetail = () => {
     const {
@@ -55,7 +56,7 @@ const BlogDetail = () => {
         imagesData.map((image) => {
             return {
                 id: image.id,
-                url: `http://localhost:8080${image.url}`,
+                url: `${API_DOMAIN}${image.url}`,
             };
         });
     const [updateBlog, { isLoading: isLoadingUpdateBlog }] =
@@ -85,7 +86,7 @@ const BlogDetail = () => {
 
     useEffect(() => {
         if (blog && thumbnail === null) {
-            setThumbnail(blog?.thumbnail);
+            setThumbnail(`${API_DOMAIN}${blog?.thumbnail}`);
         }
     }, [blog, thumbnail]);
 
@@ -368,7 +369,7 @@ const BlogDetail = () => {
                                     setThumbnail(imageSelected);
                                     setIsModalOpen(false);
                                     form.setFieldsValue({
-                                        thumbnail: imageSelected,
+                                        thumbnail: imageSelected.slice(API_DOMAIN.length),
                                     });
                                 }}
                             >

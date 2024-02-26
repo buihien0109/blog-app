@@ -1,54 +1,70 @@
-version: "3"
+version: "3.8"
 
 services:
-    frontend-blog-user-side:
-        image: buihien0109/frontend-blog-user-side:latest
-        build:
-            context: ./blog-UI-user
-            dockerfile: Dockerfile
-        ports:
-            - "3000:80"
-        depends_on:
-            - backend-blog-side
+  frontend-blog-user-side:
+    image: buihien0109/frontend-blog-user-side:latest
+    build:
+      context: ./blog-UI-user
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend-blog-side
+    networks:
+      - app-network
 
-    frontend-blog-admin-side:
-        image: buihien0109/frontend-blog-admin-side:latest
-        build:
-            context: ./blog-UI-admin
-            dockerfile: Dockerfile
-        ports:
-            - "3001:80"
-        depends_on:
-            - backend-blog-side
+  frontend-blog-admin-side:
+    image: buihien0109/frontend-blog-admin-side:latest
+    build:
+      context: ./blog-UI-admin
+      dockerfile: Dockerfile
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend-blog-side
+    networks:
+      - app-network
 
-    mysql:
-        image: mysql:latest
-        restart: always
-        volumes:
-            - ./blog-backend/data.sql:/docker-entrypoint-initdb.d/init.sql
-        environment:
-            MYSQL_ROOT_PASSWORD: 123
+  mysql:
+    image: mysql:latest
+    restart: always
+    volumes:
+      - ./blog-backend/data.sql:/docker-entrypoint-initdb.d/init.sql
+      - data_blog:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+    networks:
+      - app-network
 
-    phpmyadmin:
-        image: phpmyadmin/phpmyadmin
-        links:
-            - mysql
-        ports:
-            - "88:80"
-        environment:
-            PMA_HOST: mysql
-            MYSQL_ROOT_PASSWORD: 123
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    links:
+      - mysql
+    ports:
+      - "86:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: 123
+    networks:
+      - app-network
 
-    backend-blog-side:
-        image: buihien0109/backend-blog-side:latest
-        build:
-            context: ./blog-backend
-            dockerfile: Dockerfile
-        depends_on:
-            - mysql
-        restart: always
-        environment:
-            - SPRING_PROFILES_ACTIVE=prod
-            - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/db-blog?createDatabaseIfNotExist=true
-            - SPRING_DATASOURCE_USERNAME=root
-            - SPRING_DATASOURCE_PASSWORD=123
+  backend-blog-side:
+    image: buihien0109/backend-blog-side:latest
+    build:
+      context: ./blog-backend
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/db-blog?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=123
+    networks:
+      - app-network
+
+volumes:
+  data_blog:
+
+networks:
+  app-network:
+    driver: bridge

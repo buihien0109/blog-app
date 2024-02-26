@@ -1,7 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { API_DOMAIN_AUTH_PUBLIC } from "../../data/constants";
 
 // Define a service using a base URL and expected endpoints
-const ENDPOINT = import.meta.env.VITE_API_DOMAIN_AUTH_PUBLIC
+const ENDPOINT = API_DOMAIN_AUTH_PUBLIC;
 export const authApi = createApi({
     reducerPath: "authApi",
     baseQuery: fetchBaseQuery(

@@ -26,6 +26,7 @@ import {
 import { useDeleteProjectMutation, useGetProjectByIdQuery, useUpdateProjectMutation } from "../../../app/services/projects.service";
 import AppBreadCrumb from "../../../components/layout/AppBreadCrumb";
 import { Helmet } from "react-helmet";
+import { API_DOMAIN } from "../../../data/constants";
 
 const ProjectDetail = () => {
   const {
@@ -46,7 +47,7 @@ const ProjectDetail = () => {
     imagesData.map((image) => {
       return {
         id: image.id,
-        url: `http://localhost:8080${image.url}`,
+        url: `${API_DOMAIN}${image.url}`,
       };
     });
   const [updateProject, { isLoading: isLoadingUpdateProject }] =
@@ -76,7 +77,7 @@ const ProjectDetail = () => {
 
   useEffect(() => {
     if (project && thumbnail === null) {
-      setThumbnail(project?.thumbnail);
+      setThumbnail(`${API_DOMAIN}${project?.thumbnail}`);
     }
   }, [project, thumbnail]);
 
@@ -329,7 +330,7 @@ const ProjectDetail = () => {
                   setThumbnail(imageSelected);
                   setIsModalOpen(false);
                   form.setFieldsValue({
-                    thumbnail: imageSelected,
+                    thumbnail: imageSelected.slice(API_DOMAIN.length),
                   });
                 }}
               >
