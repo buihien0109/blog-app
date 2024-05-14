@@ -10,6 +10,7 @@ services:
       - "3000:80"
     depends_on:
       - backend-blog-side
+      - frontend-blog-admin-side
     networks:
       - app-network
 
@@ -18,8 +19,8 @@ services:
     build:
       context: ./blog-UI-admin
       dockerfile: Dockerfile
-    ports:
-      - "3001:80"
+    # ports:
+    #   - "3001:80"
     depends_on:
       - backend-blog-side
     networks:
@@ -29,7 +30,7 @@ services:
     image: mysql:latest
     restart: always
     volumes:
-      - ./blog-backend/data.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data.sql:/docker-entrypoint-initdb.d/init.sql
       - data_blog:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: 123
@@ -38,8 +39,6 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    links:
-      - mysql
     ports:
       - "86:80"
     environment:
