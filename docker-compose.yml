@@ -1,30 +1,22 @@
 version: "3.8"
 
 services:
-  frontend-blog-user-side:
+  frontend-user-side:
     image: buihien0109/frontend-blog-user-side:latest
-    build:
-      context: ./blog-UI-user
-      dockerfile: Dockerfile
     ports:
-      - "3000:80"
+      - "8886:80"
     depends_on:
-      - backend-blog-side
-      - frontend-blog-admin-side
+      - backend-side
+      - frontend-admin-side
     networks:
-      - app-network
+      - app-blog-network
 
-  frontend-blog-admin-side:
+  frontend-admin-side:
     image: buihien0109/frontend-blog-admin-side:latest
-    build:
-      context: ./blog-UI-admin
-      dockerfile: Dockerfile
-    # ports:
-    #   - "3001:80"
     depends_on:
       - backend-blog-side
     networks:
-      - app-network
+      - app-blog-network
 
   mysql:
     image: mysql:latest
@@ -35,23 +27,20 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 123
     networks:
-      - app-network
+      - app-blog-network
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     ports:
       - "86:80"
     environment:
-      PMA_HOST: mysql
+      PMA_HOST: mysql 
       MYSQL_ROOT_PASSWORD: 123
     networks:
-      - app-network
+      - app-blog-network
 
-  backend-blog-side:
+  backend-side:
     image: buihien0109/backend-blog-side:latest
-    build:
-      context: ./blog-backend
-      dockerfile: Dockerfile
     restart: always
     environment:
       - SPRING_PROFILES_ACTIVE=prod
@@ -59,11 +48,11 @@ services:
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=123
     networks:
-      - app-network
+      - app-blog-network
 
 volumes:
   data_blog:
 
 networks:
-  app-network:
+  app-blog-network:
     driver: bridge
